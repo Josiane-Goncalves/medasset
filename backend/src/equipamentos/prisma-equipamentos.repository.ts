@@ -13,6 +13,12 @@ export class PrismaEquipamentosRepository extends EquipamentosRepository {
     super();
   }
 
+  listar() {
+    return this.prisma.equipamento.findMany({
+      orderBy: { criadoEm: 'desc' },
+    });
+  }
+
   buscarPorNumeroSerie(numeroSerie: string) {
     return this.prisma.equipamento.findUnique({ where: { numeroSerie } });
   }

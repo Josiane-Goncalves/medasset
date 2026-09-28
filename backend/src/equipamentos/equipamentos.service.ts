@@ -12,6 +12,10 @@ export class EquipamentosService {
     private readonly equipamentosRepository: EquipamentosRepository,
   ) {}
 
+  listarEquipamentos() {
+    return this.equipamentosRepository.listar();
+  }
+
   async cadastrarEquipamento(dados: DadosCadastroEquipamento) {
     await this.verificarDuplicidade(dados);
 

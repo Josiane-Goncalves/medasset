@@ -11,6 +11,7 @@ export interface DadosCadastroEquipamento {
 export class ErroUnicidadePersistencia extends Error {}
 
 export abstract class EquipamentosRepository {
+  abstract listar(): Promise<Equipamento[]>;
   abstract buscarPorNumeroSerie(
     numeroSerie: string,
   ): Promise<Equipamento | null>;

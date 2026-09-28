@@ -7,7 +7,7 @@ import {
 } from '../src/equipamentos/equipamentos.repository';
 import { EquipamentosService } from '../src/equipamentos/equipamentos.service';
 
-describe('Cadastro de equipamentos', () => {
+describe('EquipamentosService', () => {
   let repositorio: jest.Mocked<EquipamentosRepository>;
   let servico: EquipamentosService;
 
@@ -28,11 +28,37 @@ describe('Cadastro de equipamentos', () => {
 
   beforeEach(() => {
     repositorio = {
+      listar: jest.fn().mockResolvedValue([]),
       buscarPorNumeroSerie: jest.fn().mockResolvedValue(null),
       buscarPorPatrimonio: jest.fn().mockResolvedValue(null),
       criar: jest.fn().mockResolvedValue(equipamento),
     };
     servico = new EquipamentosService(repositorio);
+  });
+
+  describe('Listagem de equipamentos', () => {
+    it('retorna todos os equipamentos recebidos do repository na mesma ordem', async () => {
+      const equipamentos = [
+        {
+          ...equipamento,
+          id: '00000000-0000-4000-8000-000000000002',
+          numeroSerie: 'SERIE-02',
+          patrimonio: null,
+          criadoEm: new Date('2026-09-29T12:00:00Z'),
+          atualizadoEm: new Date('2026-09-29T12:00:00Z'),
+        },
+        equipamento,
+      ];
+      repositorio.listar.mockResolvedValue(equipamentos);
+
+      await expect(servico.listarEquipamentos()).resolves.toEqual(equipamentos);
+    });
+
+    it('retorna lista vazia quando nao existem equipamentos', async () => {
+      repositorio.listar.mockResolvedValue([]);
+
+      await expect(servico.listarEquipamentos()).resolves.toEqual([]);
+    });
   });
 
   it('cadastra equipamento valido e retorna o registro persistido', async () => {

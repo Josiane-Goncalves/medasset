@@ -4,9 +4,10 @@ import { ErroUnicidadePersistencia } from '../src/equipamentos/equipamentos.repo
 import { PrismaEquipamentosRepository } from '../src/equipamentos/prisma-equipamentos.repository';
 import { PrismaService } from '../src/prisma/prisma.service';
 
-describe('Erros de persistencia do repository Prisma', () => {
+describe('Repository Prisma de equipamentos', () => {
   let repositorio: PrismaEquipamentosRepository;
   const criar = jest.fn();
+  const listar = jest.fn();
   const dados = {
     equipamento: 'Monitor',
     marca: 'Marca',
@@ -16,17 +17,34 @@ describe('Erros de persistencia do repository Prisma', () => {
 
   beforeEach(async () => {
     criar.mockReset();
+    listar.mockReset();
     const modulo = await Test.createTestingModule({
       providers: [
         PrismaEquipamentosRepository,
         {
           provide: PrismaService,
-          useValue: { equipamento: { create: criar } },
+          useValue: { equipamento: { create: criar, findMany: listar } },
         },
       ],
     }).compile();
 
     repositorio = modulo.get(PrismaEquipamentosRepository);
+  });
+
+  it('consulta todos os equipamentos por criadoEm decrescente e retorna os registros', async () => {
+    const equipamentos = [
+      {
+        ...dados,
+        id: '00000000-0000-4000-8000-000000000001',
+        patrimonio: null,
+        criadoEm: new Date('2026-09-28T12:00:00Z'),
+        atualizadoEm: new Date('2026-09-28T12:00:00Z'),
+      },
+    ];
+    listar.mockResolvedValue(equipamentos);
+
+    await expect(repositorio.listar()).resolves.toEqual(equipamentos);
+    expect(listar).toHaveBeenCalledWith({ orderBy: { criadoEm: 'desc' } });
   });
 
   it('sinaliza uma violacao de unicidade sem decidir a mensagem de negocio', async () => {

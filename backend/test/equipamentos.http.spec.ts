@@ -22,6 +22,12 @@ describe('POST /equipamentos', () => {
     patrimonio: 'PAT-01',
   };
   const repositorio: EquipamentosRepository = {
+    async listar() {
+      return equipamentos.toSorted(
+        (primeiro, segundo) =>
+          segundo.criadoEm.getTime() - primeiro.criadoEm.getTime(),
+      );
+    },
     async buscarPorNumeroSerie(numeroSerie) {
       return (
         equipamentos.find(
