@@ -11,6 +11,6 @@ if (!elementoRaiz) {
 
 createRoot(elementoRaiz).render(
   <StrictMode>
-    <Aplicacao />
+    <Aplicacao urlApi={import.meta.env.VITE_API_URL} />
   </StrictMode>,
 );

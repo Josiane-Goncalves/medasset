@@ -1,14 +1,241 @@
 :root {
-  font-family: system-ui, sans-serif;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   line-height: 1.5;
-  color: #172b3a;
-  background: #f5f7fa;
+  color: #233d49;
+  background: #f3f6f7;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
 }
 body {
   margin: 0;
+  min-width: 320px;
+}
+
+.cabecalho {
+  background: #fff;
+  border-bottom: 1px solid #dbe4e7;
+  padding: 1.1rem max(1.5rem, calc((100% - 960px) / 2));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.35rem;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+}
+.simbolo-marca {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: #0d756c;
+  color: #fff;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+.descricao-marca {
+  font-size: 0.85rem;
+  color: #576b75;
 }
 main {
-  max-width: 48rem;
-  margin: 4rem auto;
+  max-width: 800px;
+  margin: 3.5rem auto;
   padding: 0 1.5rem;
+}
+.introducao {
+  margin-bottom: 1.75rem;
+}
+.identificador {
+  color: #0d756c;
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  margin: 0 0 0.65rem;
+}
+h1 {
+  color: #183541;
+  font-size: clamp(1.7rem, 4vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  margin: 0 0 0.8rem;
+}
+.introducao > p:last-child {
+  margin: 0;
+  color: #576b75;
+  font-size: 0.95rem;
+}
+form {
+  background: #fff;
+  border: 1px solid #dbe4e7;
+  border-radius: 0.85rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px #233d4905;
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+legend {
+  font-size: 1.05rem;
+  font-weight: 650;
+  padding: 0;
+}
+.orientacao {
+  color: #576b75;
+  font-size: 0.8rem;
+  margin: 0.45rem 0 1.65rem;
+}
+.campos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.35rem 1.5rem;
+}
+.campo-equipamento {
+  grid-column: 1 / -1;
+}
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+.obrigatorio {
+  color: #0d756c;
+}
+.opcional {
+  color: #657680;
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+input {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #aebfc7;
+  border-radius: 0.4rem;
+  background: #fff;
+  color: #233d49;
+  font: inherit;
+  font-size: 0.95rem;
+}
+input::placeholder {
+  color: #6e7e87;
+}
+input:hover {
+  border-color: #718c98;
+}
+input:focus-visible,
+button:focus-visible {
+  outline: 3px solid #9ad8cf;
+  outline-offset: 3px;
+}
+input:focus-visible {
+  border-color: #0d756c;
+}
+input[aria-invalid='true'] {
+  border-color: #b43b39;
+}
+input:disabled {
+  background: #f1f5f6;
+  color: #576b75;
+}
+.erro-campo {
+  color: #a32d2b;
+  font-size: 0.8rem;
+  margin: 0.4rem 0 0;
+}
+.mensagem {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.mensagem-sucesso {
+  color: #176042;
+  background: #edf8f1;
+  border-color: #b9dcca;
+}
+.mensagem-erro {
+  color: #912e2c;
+  background: #fff3f2;
+  border-color: #edc8c5;
+}
+.acoes {
+  border-top: 1px solid #e3eaed;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.aviso-envio {
+  font-size: 0.8rem;
+  color: #576b75;
+  max-width: 15rem;
+}
+button {
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  padding: 0.8rem 1.2rem;
+  background: #0d756c;
+  color: #fff;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+button:hover:not(:disabled) {
+  background: #095e56;
+}
+button:disabled {
+  background: #597f7b;
+  cursor: wait;
+}
+
+@media (max-width: 600px) {
+  .cabecalho {
+    padding: 1rem 1.25rem;
+  }
+  .descricao-marca {
+    display: none;
+  }
+  main {
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  form {
+    padding: 1.4rem 1.2rem;
+  }
+  .campos {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+  .acoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .aviso-envio {
+    max-width: none;
+  }
 }
