@@ -1,0 +1,21 @@
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Dependências
+node_modules/
+
+# Builds
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Documentação interna
+AGENTS.md
+docs-internal/
+
+# Editor / sistema
+.vscode/
+.DS_Store

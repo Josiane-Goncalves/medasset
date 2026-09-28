@@ -1,0 +1,21 @@
+name: medasset
+
+services:
+  banco:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: medasset
+      POSTGRES_DB: medasset
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD em backend/.env}
+    ports:
+      - '127.0.0.1:55432:5432'
+    volumes:
+      - dados_postgres:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U medasset -d medasset']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  dados_postgres:
