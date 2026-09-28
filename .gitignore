@@ -19,3 +19,6 @@ docs-internal/
 # Editor / sistema
 .vscode/
 .DS_Store
+
+# Cliente Prisma gerado
+backend/src/gerado/prisma/

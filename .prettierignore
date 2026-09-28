@@ -4,3 +4,4 @@ coverage/
 package-lock.json
 AGENTS.md
 docs-internal/
+**/gerado/prisma/

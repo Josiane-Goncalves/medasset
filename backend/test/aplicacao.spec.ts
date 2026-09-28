@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing';
 import { IsString } from 'class-validator';
 import request from 'supertest';
 import type { Server } from 'node:http';
+import { PrismaService } from '../src/prisma/prisma.service';
 import { AplicacaoModule } from '../src/aplicacao.module';
 import { configurarAplicacao } from '../src/configurar-aplicacao';
 
@@ -33,7 +34,10 @@ describe('Fundacao da API', () => {
     const modulo = await Test.createTestingModule({
       imports: [AplicacaoModule],
       controllers: [ConfiguracaoTesteController],
-    }).compile();
+    })
+      .overrideProvider(PrismaService)
+      .useValue({})
+      .compile();
 
     aplicacao = modulo.createNestApplication();
     configurarAplicacao(aplicacao);

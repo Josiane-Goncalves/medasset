@@ -16,18 +16,24 @@
     "test": "jest --runInBand",
     "prisma:validate": "prisma validate",
     "prisma:format": "prisma format",
-    "prisma:conexao": "prisma db execute --file prisma/verificar-conexao.sql"
+    "prisma:conexao": "prisma db execute --file prisma/verificar-conexao.sql",
+    "prisma:generate": "prisma generate",
+    "prebuild": "npm run prisma:generate",
+    "predev": "npm run prisma:generate",
+    "prestart": "npm run prisma:generate",
+    "pretest": "npm run prisma:generate"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.0",
     "@nestjs/core": "^11.1.0",
     "@nestjs/platform-express": "^11.1.0",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "dotenv": "^17.0.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.0",
-    "@prisma/client": "7.10.0"
+    "rxjs": "^7.8.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
