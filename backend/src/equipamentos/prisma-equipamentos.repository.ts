@@ -19,6 +19,10 @@ export class PrismaEquipamentosRepository extends EquipamentosRepository {
     });
   }
 
+  buscarPorId(id: string) {
+    return this.prisma.equipamento.findUnique({ where: { id } });
+  }
+
   buscarPorNumeroSerie(numeroSerie: string) {
     return this.prisma.equipamento.findUnique({ where: { numeroSerie } });
   }

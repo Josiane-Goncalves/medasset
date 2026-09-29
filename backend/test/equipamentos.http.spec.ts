@@ -29,6 +29,9 @@ describe('/equipamentos', () => {
           segundo.criadoEm.getTime() - primeiro.criadoEm.getTime(),
       );
     },
+    async buscarPorId(id) {
+      return equipamentos.find((equipamento) => equipamento.id === id) ?? null;
+    },
     async buscarPorNumeroSerie(numeroSerie) {
       return (
         equipamentos.find(

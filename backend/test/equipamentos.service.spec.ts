@@ -1,4 +1,5 @@
 import { ErroConflitoEquipamento } from '../src/equipamentos/erro-conflito-equipamento';
+import { ErroEquipamentoNaoEncontrado } from '../src/equipamentos/erro-equipamento-nao-encontrado';
 import type { Equipamento } from '../src/gerado/prisma/client';
 import {
   DadosCadastroEquipamento,
@@ -29,6 +30,7 @@ describe('EquipamentosService', () => {
   beforeEach(() => {
     repositorio = {
       listar: jest.fn().mockResolvedValue([]),
+      buscarPorId: jest.fn().mockResolvedValue(null),
       buscarPorNumeroSerie: jest.fn().mockResolvedValue(null),
       buscarPorPatrimonio: jest.fn().mockResolvedValue(null),
       criar: jest.fn().mockResolvedValue(equipamento),
@@ -58,6 +60,31 @@ describe('EquipamentosService', () => {
       repositorio.listar.mockResolvedValue([]);
 
       await expect(servico.listarEquipamentos()).resolves.toEqual([]);
+    });
+  });
+
+  describe('Busca de equipamento por ID', () => {
+    it('retorna o equipamento quando o ID existe', async () => {
+      repositorio.buscarPorId.mockResolvedValue(equipamento);
+
+      await expect(
+        servico.buscarEquipamentoPorId(equipamento.id),
+      ).resolves.toEqual(equipamento);
+      expect(repositorio.buscarPorId).toHaveBeenCalledWith(equipamento.id);
+    });
+
+    it('lanca erro de equipamento nao encontrado quando o ID nao existe', async () => {
+      repositorio.buscarPorId.mockResolvedValue(null);
+
+      const busca = servico.buscarEquipamentoPorId(
+        '00000000-0000-4000-8000-000000000002',
+      );
+
+      await expect(busca).rejects.toBeInstanceOf(ErroEquipamentoNaoEncontrado);
+      await expect(busca).rejects.toHaveProperty(
+        'message',
+        'Equipamento não encontrado.',
+      );
     });
   });
 

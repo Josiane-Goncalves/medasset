@@ -8,6 +8,7 @@ describe('Repository Prisma de equipamentos', () => {
   let repositorio: PrismaEquipamentosRepository;
   const criar = jest.fn();
   const listar = jest.fn();
+  const buscar = jest.fn();
   const dados = {
     equipamento: 'Monitor',
     marca: 'Marca',
@@ -18,12 +19,19 @@ describe('Repository Prisma de equipamentos', () => {
   beforeEach(async () => {
     criar.mockReset();
     listar.mockReset();
+    buscar.mockReset();
     const modulo = await Test.createTestingModule({
       providers: [
         PrismaEquipamentosRepository,
         {
           provide: PrismaService,
-          useValue: { equipamento: { create: criar, findMany: listar } },
+          useValue: {
+            equipamento: {
+              create: criar,
+              findMany: listar,
+              findUnique: buscar,
+            },
+          },
         },
       ],
     }).compile();
@@ -45,6 +53,22 @@ describe('Repository Prisma de equipamentos', () => {
 
     await expect(repositorio.listar()).resolves.toEqual(equipamentos);
     expect(listar).toHaveBeenCalledWith({ orderBy: { criadoEm: 'desc' } });
+  });
+
+  it('consulta pelo ID informado e retorna o equipamento encontrado', async () => {
+    const equipamento = {
+      ...dados,
+      id: '00000000-0000-4000-8000-000000000001',
+      patrimonio: null,
+      criadoEm: new Date('2026-09-28T12:00:00Z'),
+      atualizadoEm: new Date('2026-09-28T12:00:00Z'),
+    };
+    buscar.mockResolvedValue(equipamento);
+
+    await expect(repositorio.buscarPorId(equipamento.id)).resolves.toEqual(
+      equipamento,
+    );
+    expect(buscar).toHaveBeenCalledWith({ where: { id: equipamento.id } });
   });
 
   it('sinaliza uma violacao de unicidade sem decidir a mensagem de negocio', async () => {

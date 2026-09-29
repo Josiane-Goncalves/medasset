@@ -12,6 +12,7 @@ export class ErroUnicidadePersistencia extends Error {}
 
 export abstract class EquipamentosRepository {
   abstract listar(): Promise<Equipamento[]>;
+  abstract buscarPorId(id: string): Promise<Equipamento | null>;
   abstract buscarPorNumeroSerie(
     numeroSerie: string,
   ): Promise<Equipamento | null>;

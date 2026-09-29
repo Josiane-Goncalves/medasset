@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ErroConflitoEquipamento } from './erro-conflito-equipamento';
+import { ErroEquipamentoNaoEncontrado } from './erro-equipamento-nao-encontrado';
 import {
   DadosCadastroEquipamento,
   EquipamentosRepository,
@@ -14,6 +15,16 @@ export class EquipamentosService {
 
   listarEquipamentos() {
     return this.equipamentosRepository.listar();
+  }
+
+  async buscarEquipamentoPorId(id: string) {
+    const equipamento = await this.equipamentosRepository.buscarPorId(id);
+
+    if (equipamento === null) {
+      throw new ErroEquipamentoNaoEncontrado();
+    }
+
+    return equipamento;
   }
 
   async cadastrarEquipamento(dados: DadosCadastroEquipamento) {
