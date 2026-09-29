@@ -7,10 +7,11 @@ import request from 'supertest';
 import { AplicacaoModule } from '../src/aplicacao.module';
 import { configurarAplicacao } from '../src/configurar-aplicacao';
 import { EquipamentosRepository } from '../src/equipamentos/equipamentos.repository';
+import { EquipamentosService } from '../src/equipamentos/equipamentos.service';
 import type { Equipamento } from '../src/gerado/prisma/client';
 import { PrismaService } from '../src/prisma/prisma.service';
 
-describe('POST /equipamentos', () => {
+describe('/equipamentos', () => {
   let aplicacao: INestApplication<Server>;
   const origemOriginal = process.env.FRONTEND_ORIGIN;
   const equipamentos: Equipamento[] = [];
@@ -87,6 +88,53 @@ describe('POST /equipamentos', () => {
     } else {
       process.env.FRONTEND_ORIGIN = origemOriginal;
     }
+  });
+
+  describe('GET /equipamentos', () => {
+    it('retorna 200 com os equipamentos na ordem fornecida pelo service', async () => {
+      const equipamentosListados: Equipamento[] = [
+        {
+          ...dadosValidos,
+          id: '00000000-0000-4000-8000-000000000001',
+          criadoEm: new Date('2026-09-28T12:00:00Z'),
+          atualizadoEm: new Date('2026-09-28T12:00:00Z'),
+        },
+        {
+          ...dadosValidos,
+          id: '00000000-0000-4000-8000-000000000002',
+          numeroSerie: 'SERIE-02',
+          patrimonio: null,
+          criadoEm: new Date('2026-09-29T12:00:00Z'),
+          atualizadoEm: new Date('2026-09-29T12:00:00Z'),
+        },
+      ];
+      jest
+        .spyOn(aplicacao.get(EquipamentosService), 'listarEquipamentos')
+        .mockResolvedValueOnce(equipamentosListados);
+
+      const resposta = await request(aplicacao.getHttpServer())
+        .get('/equipamentos')
+        .expect(200);
+
+      expect(resposta.body).toEqual(
+        equipamentosListados.map((equipamento) => ({
+          ...equipamento,
+          criadoEm: equipamento.criadoEm.toISOString(),
+          atualizadoEm: equipamento.atualizadoEm.toISOString(),
+        })),
+      );
+    });
+
+    it('retorna 200 com lista vazia quando nao existem equipamentos', async () => {
+      jest
+        .spyOn(aplicacao.get(EquipamentosService), 'listarEquipamentos')
+        .mockResolvedValueOnce([]);
+
+      await request(aplicacao.getHttpServer())
+        .get('/equipamentos')
+        .expect(200)
+        .expect([]);
+    });
   });
 
   it('retorna 201 e o equipamento criado', async () => {
