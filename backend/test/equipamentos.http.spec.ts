@@ -8,6 +8,7 @@ import { AplicacaoModule } from '../src/aplicacao.module';
 import { configurarAplicacao } from '../src/configurar-aplicacao';
 import { EquipamentosRepository } from '../src/equipamentos/equipamentos.repository';
 import { EquipamentosService } from '../src/equipamentos/equipamentos.service';
+import { ErroEquipamentoNaoEncontrado } from '../src/equipamentos/erro-equipamento-nao-encontrado';
 import type { Equipamento } from '../src/gerado/prisma/client';
 import { PrismaService } from '../src/prisma/prisma.service';
 
@@ -137,6 +138,63 @@ describe('/equipamentos', () => {
         .get('/equipamentos')
         .expect(200)
         .expect([]);
+    });
+  });
+
+  describe('GET /equipamentos/:id', () => {
+    it('retorna 200 com os dados fornecidos pelo service para o ID solicitado', async () => {
+      const equipamento: Equipamento = {
+        ...dadosValidos,
+        id: '00000000-0000-4000-8000-000000000001',
+        criadoEm: new Date('2026-09-28T12:00:00Z'),
+        atualizadoEm: new Date('2026-09-28T12:00:00Z'),
+      };
+      const buscar = jest
+        .spyOn(aplicacao.get(EquipamentosService), 'buscarEquipamentoPorId')
+        .mockResolvedValueOnce(equipamento);
+
+      await request(aplicacao.getHttpServer())
+        .get('/equipamentos/' + equipamento.id)
+        .expect(200)
+        .expect({
+          ...equipamento,
+          criadoEm: equipamento.criadoEm.toISOString(),
+          atualizadoEm: equipamento.atualizadoEm.toISOString(),
+        });
+
+      expect(buscar).toHaveBeenCalledWith(equipamento.id);
+    });
+
+    it('retorna 404 com a mensagem da aplicacao quando o equipamento nao existe', async () => {
+      jest
+        .spyOn(aplicacao.get(EquipamentosService), 'buscarEquipamentoPorId')
+        .mockRejectedValueOnce(new ErroEquipamentoNaoEncontrado());
+
+      await request(aplicacao.getHttpServer())
+        .get('/equipamentos/00000000-0000-4000-8000-000000000002')
+        .expect(404)
+        .expect({
+          statusCode: 404,
+          message: 'Equipamento não encontrado.',
+          error: 'Not Found',
+        });
+    });
+
+    it('retorna 400 para UUID invalido antes de chamar o service', async () => {
+      const buscar = jest.spyOn(
+        aplicacao.get(EquipamentosService),
+        'buscarEquipamentoPorId',
+      );
+
+      const resposta = await request(aplicacao.getHttpServer())
+        .get('/equipamentos/id-invalido')
+        .expect(400);
+
+      expect(resposta.body).toMatchObject({
+        statusCode: 400,
+        error: 'Bad Request',
+      });
+      expect(buscar).not.toHaveBeenCalled();
     });
   });
 
