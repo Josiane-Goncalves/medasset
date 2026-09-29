@@ -54,7 +54,7 @@ body {
   color: #576b75;
 }
 main {
-  max-width: 800px;
+  max-width: 960px;
   margin: 3.5rem auto;
   padding: 0 1.5rem;
 }
@@ -238,4 +238,55 @@ button:disabled {
   .aviso-envio {
     max-width: none;
   }
+}
+
+h2 {
+  color: #183541;
+  font-size: 1.25rem;
+  font-weight: 650;
+  margin: 0 0 1rem;
+}
+.listagem {
+  margin-top: 2.5rem;
+}
+.estado-listagem {
+  padding: 2rem 1.5rem;
+  border: 1px solid #dbe4e7;
+  border-radius: 0.65rem;
+  background: #fff;
+  color: #576b75;
+  text-align: center;
+}
+.tabela-responsiva {
+  overflow-x: auto;
+  border: 1px solid #dbe4e7;
+  border-radius: 0.65rem;
+  background: #fff;
+}
+.tabela-responsiva:focus-visible {
+  outline: 3px solid #9ad8cf;
+  outline-offset: 3px;
+}
+table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+th,
+td {
+  padding: 1rem;
+  overflow-wrap: anywhere;
+}
+th {
+  background: #eaf1f2;
+  color: #344f5b;
+  font-weight: 650;
+}
+td {
+  border-top: 1px solid #e3eaed;
+}
+tbody tr:hover {
+  background: #f7fafb;
 }
