@@ -269,7 +269,7 @@ h2 {
 }
 table {
   width: 100%;
-  min-width: 680px;
+  min-width: 820px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.875rem;
@@ -289,4 +289,65 @@ td {
 }
 tbody tr:hover {
   background: #f7fafb;
+}
+
+.botao-secundario {
+  background: #fff;
+  color: #0b625a;
+  border-color: #a8c8c4;
+  white-space: nowrap;
+}
+.botao-secundario:hover:not(:disabled) {
+  background: #eaf5f2;
+}
+.painel-detalhes {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #dbe4e7;
+  border-radius: 0.65rem;
+}
+.cabecalho-detalhes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+.cabecalho-detalhes h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #183541;
+}
+.cabecalho-detalhes h3:focus-visible {
+  outline: 3px solid #9ad8cf;
+  outline-offset: 4px;
+}
+.dados-detalhes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e3eaed;
+}
+.dados-detalhes dt {
+  color: #576b75;
+  font-size: 0.8rem;
+}
+.dados-detalhes dd {
+  margin: 0.3rem 0 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .painel-detalhes {
+    padding: 1.2rem;
+  }
+  .cabecalho-detalhes {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .dados-detalhes {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }

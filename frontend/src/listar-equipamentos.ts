@@ -1,31 +1,9 @@
-export interface EquipamentoListado {
-  id: string;
-  equipamento: string;
-  marca: string;
-  modelo: string;
-  numeroSerie: string;
-  patrimonio?: string | null;
-}
-
-function equipamentoValido(valor: unknown): valor is EquipamentoListado {
-  if (typeof valor !== 'object' || valor === null) return false;
-
-  const equipamento = valor as Partial<EquipamentoListado>;
-  return (
-    typeof equipamento.id === 'string' &&
-    typeof equipamento.equipamento === 'string' &&
-    typeof equipamento.marca === 'string' &&
-    typeof equipamento.modelo === 'string' &&
-    typeof equipamento.numeroSerie === 'string' &&
-    (equipamento.patrimonio == null ||
-      typeof equipamento.patrimonio === 'string')
-  );
-}
+import { equipamentoValido, type Equipamento } from './equipamento';
 
 export async function listarEquipamentos(
   urlApi: string | undefined,
   sinal: AbortSignal,
-): Promise<EquipamentoListado[]> {
+): Promise<Equipamento[]> {
   if (!urlApi) throw new Error('URL da API nao configurada.');
 
   const resposta = await fetch(`${urlApi.replace(/\/+$/, '')}/equipamentos`, {

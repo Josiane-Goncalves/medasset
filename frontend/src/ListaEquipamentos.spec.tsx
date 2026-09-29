@@ -64,8 +64,8 @@ it('exibe os cinco campos na ordem recebida e usa travessão para patrimônio au
         .map((celula) => celula.textContent),
     ),
   ).toEqual([
-    ['Ventilador', 'Dräger', 'Savina', 'SN002', 'PAT002'],
-    ['Monitor', 'Philips', 'MP20', 'SN001', '—'],
+    ['Ventilador', 'Dräger', 'Savina', 'SN002', 'PAT002', 'Ver detalhes'],
+    ['Monitor', 'Philips', 'MP20', 'SN001', '—', 'Ver detalhes'],
   ]);
   expect(requisicao).toHaveBeenCalledWith(
     'http://localhost:3000/equipamentos',

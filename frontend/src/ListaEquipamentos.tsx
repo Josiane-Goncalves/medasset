@@ -1,18 +1,23 @@
-import { useEffect, useState } from 'react';
-import {
-  listarEquipamentos,
-  type EquipamentoListado,
-} from './listar-equipamentos';
+import { useEffect, useRef, useState } from 'react';
+import { listarEquipamentos } from './listar-equipamentos';
+import type { Equipamento } from './equipamento';
+import { DetalhesEquipamento } from './DetalhesEquipamento';
 
 type EstadoListagem =
   | { tipo: 'carregando' }
-  | { tipo: 'sucesso'; equipamentos: EquipamentoListado[] }
+  | { tipo: 'sucesso'; equipamentos: Equipamento[] }
   | { tipo: 'erro' };
 
 export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
   const [estado, definirEstado] = useState<EstadoListagem>({
     tipo: 'carregando',
   });
+
+  const [selecao, definirSelecao] = useState<{
+    id: string;
+    versao: number;
+  } | null>(null);
+  const botaoSelecionado = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const controlador = new AbortController();
@@ -68,6 +73,7 @@ export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
                   <th scope="col">Modelo</th>
                   <th scope="col">Número de série</th>
                   <th scope="col">Patrimônio</th>
+                  <th scope="col">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,12 +84,45 @@ export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
                     <td>{equipamento.modelo}</td>
                     <td>{equipamento.numeroSerie}</td>
                     <td>{equipamento.patrimonio ?? '—'}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="botao-secundario"
+                        aria-label={`Ver detalhes de ${equipamento.equipamento} (${equipamento.numeroSerie})`}
+                        aria-expanded={selecao?.id === equipamento.id}
+                        aria-controls={
+                          selecao?.id === equipamento.id
+                            ? 'detalhes-equipamento'
+                            : undefined
+                        }
+                        onClick={(evento) => {
+                          botaoSelecionado.current = evento.currentTarget;
+                          definirSelecao((anterior) => ({
+                            id: equipamento.id,
+                            versao: (anterior?.versao ?? 0) + 1,
+                          }));
+                        }}
+                      >
+                        Ver detalhes
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ))}
+      {selecao && (
+        <DetalhesEquipamento
+          key={`${selecao.id}-${selecao.versao}`}
+          urlApi={urlApi}
+          id={selecao.id}
+          aoFechar={() => {
+            definirSelecao(null);
+            botaoSelecionado.current?.focus();
+          }}
+        />
+      )}
     </section>
   );
 }
