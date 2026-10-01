@@ -7,7 +7,9 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
 } from '@nestjs/common';
+import { AtualizarEquipamentoDto } from './atualizar-equipamento.dto';
 import { CriarEquipamentoDto } from './criar-equipamento.dto';
 import { EquipamentosService } from './equipamentos.service';
 import { ErroConflitoEquipamento } from './erro-conflito-equipamento';
@@ -40,6 +42,26 @@ export class EquipamentosController {
     try {
       return await this.equipamentosService.cadastrarEquipamento(dados);
     } catch (erro) {
+      if (erro instanceof ErroConflitoEquipamento) {
+        throw new ConflictException(erro.message);
+      }
+
+      throw erro;
+    }
+  }
+
+  @Put(':id')
+  async atualizarEquipamento(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dados: AtualizarEquipamentoDto,
+  ) {
+    try {
+      return await this.equipamentosService.atualizarEquipamento(id, dados);
+    } catch (erro) {
+      if (erro instanceof ErroEquipamentoNaoEncontrado) {
+        throw new NotFoundException(erro.message);
+      }
+
       if (erro instanceof ErroConflitoEquipamento) {
         throw new ConflictException(erro.message);
       }

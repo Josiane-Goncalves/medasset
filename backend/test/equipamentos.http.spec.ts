@@ -47,7 +47,16 @@ describe('/equipamentos', () => {
         ) ?? null
       );
     },
-    atualizar: jest.fn(),
+    async atualizar(id, dados) {
+      const equipamento = equipamentos.find((registro) => registro.id === id);
+      if (!equipamento) throw new Error('Registro de teste inexistente.');
+
+      Object.assign(equipamento, dados, {
+        patrimonio: dados.patrimonio ?? null,
+        atualizadoEm: new Date(),
+      });
+      return equipamento;
+    },
     async criar(dados) {
       const equipamento: Equipamento = {
         ...dados,
@@ -339,5 +348,125 @@ describe('/equipamentos', () => {
       .send(dadosValidos)
       .expect(500)
       .expect({ statusCode: 500, message: 'Internal server error' });
+  });
+
+  describe('PUT /equipamentos/:id', () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+    const novosDados = {
+      equipamento: 'Ventilador',
+      marca: 'Outra marca',
+      modelo: 'Outro modelo',
+      numeroSerie: 'SERIE-02',
+      patrimonio: 'PAT-02',
+    };
+
+    beforeEach(() => {
+      equipamentos.push({
+        ...dadosValidos,
+        id,
+        criadoEm: new Date('2026-09-28T12:00:00Z'),
+        atualizadoEm: new Date('2026-09-28T12:00:00Z'),
+      });
+    });
+
+    it('retorna 200 com o registro atualizado e delega os dados completos ao service', async () => {
+      const atualizar = jest.spyOn(
+        aplicacao.get(EquipamentosService),
+        'atualizarEquipamento',
+      );
+      const resposta = await request(aplicacao.getHttpServer())
+        .put('/equipamentos/' + id)
+        .send(novosDados)
+        .expect(200);
+
+      expect(atualizar).toHaveBeenCalledWith(id, novosDados);
+      expect(resposta.body).toEqual({
+        ...novosDados,
+        id,
+        criadoEm: '2026-09-28T12:00:00.000Z',
+        atualizadoEm: expect.any(String),
+      });
+      expect(equipamentos[0]).toMatchObject(novosDados);
+    });
+
+    it('retorna 400 para UUID invalido antes de chamar o service', async () => {
+      const atualizar = jest.spyOn(
+        aplicacao.get(EquipamentosService),
+        'atualizarEquipamento',
+      );
+
+      await request(aplicacao.getHttpServer())
+        .put('/equipamentos/id-invalido')
+        .send(novosDados)
+        .expect(400);
+
+      expect(atualizar).not.toHaveBeenCalled();
+    });
+
+    it('retorna 404 quando o equipamento nao existe', async () => {
+      await request(aplicacao.getHttpServer())
+        .put('/equipamentos/00000000-0000-4000-8000-000000000002')
+        .send(novosDados)
+        .expect(404)
+        .expect({
+          statusCode: 404,
+          message: 'Equipamento não encontrado.',
+          error: 'Not Found',
+        });
+    });
+
+    it('retorna 400 para campo obrigatorio ausente antes de chamar o service', async () => {
+      const atualizar = jest.spyOn(
+        aplicacao.get(EquipamentosService),
+        'atualizarEquipamento',
+      );
+      const resposta = await request(aplicacao.getHttpServer())
+        .put('/equipamentos/' + id)
+        .send({ ...novosDados, equipamento: undefined })
+        .expect(400);
+
+      expect(resposta.body.message).toEqual(
+        expect.arrayContaining([expect.stringContaining('equipamento')]),
+      );
+      expect(atualizar).not.toHaveBeenCalled();
+    });
+
+    it('retorna 409 para numero de serie duplicado preservando a mensagem de negocio', async () => {
+      const outroEquipamento = await repositorio.criar({
+        ...novosDados,
+        numeroSerie: 'SERIE-03',
+        patrimonio: 'PAT-03',
+      });
+
+      await request(aplicacao.getHttpServer())
+        .put('/equipamentos/' + outroEquipamento.id)
+        .send({ ...novosDados, numeroSerie: dadosValidos.numeroSerie })
+        .expect(409)
+        .expect({
+          statusCode: 409,
+          error: 'Conflict',
+          message:
+            'Já existe um equipamento cadastrado com este número de série.',
+        });
+    });
+
+    it('aceita patrimonio omitido e retorna o equipamento sem o patrimonio anterior', async () => {
+      const dadosSemPatrimonio: Partial<typeof novosDados> = { ...novosDados };
+      delete dadosSemPatrimonio.patrimonio;
+
+      const resposta = await request(aplicacao.getHttpServer())
+        .put('/equipamentos/' + id)
+        .send(dadosSemPatrimonio)
+        .expect(200);
+
+      expect(resposta.body).toEqual({
+        ...dadosSemPatrimonio,
+        id,
+        patrimonio: null,
+        criadoEm: '2026-09-28T12:00:00.000Z',
+        atualizadoEm: expect.any(String),
+      });
+      expect(equipamentos[0].patrimonio).toBeNull();
+    });
   });
 });
