@@ -351,3 +351,8 @@ tbody tr:hover {
     gap: 1rem;
   }
 }
+
+.formulario-edicao,
+.acoes-edicao {
+  margin-top: 1.5rem;
+}

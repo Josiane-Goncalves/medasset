@@ -117,6 +117,20 @@ export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
           key={`${selecao.id}-${selecao.versao}`}
           urlApi={urlApi}
           id={selecao.id}
+          aoAtualizar={(equipamentoAtualizado) => {
+            definirEstado((anterior) =>
+              anterior.tipo === 'sucesso'
+                ? {
+                    ...anterior,
+                    equipamentos: anterior.equipamentos.map((equipamento) =>
+                      equipamento.id === equipamentoAtualizado.id
+                        ? equipamentoAtualizado
+                        : equipamento,
+                    ),
+                  }
+                : anterior,
+            );
+          }}
           aoFechar={() => {
             definirSelecao(null);
             botaoSelecionado.current?.focus();
