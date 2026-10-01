@@ -34,6 +34,7 @@ describe('EquipamentosService', () => {
       buscarPorNumeroSerie: jest.fn().mockResolvedValue(null),
       buscarPorPatrimonio: jest.fn().mockResolvedValue(null),
       criar: jest.fn().mockResolvedValue(equipamento),
+      atualizar: jest.fn(),
     };
     servico = new EquipamentosService(repositorio);
   });

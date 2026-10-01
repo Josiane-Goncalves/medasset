@@ -7,6 +7,7 @@ import { PrismaService } from '../src/prisma/prisma.service';
 describe('Repository Prisma de equipamentos', () => {
   let repositorio: PrismaEquipamentosRepository;
   const criar = jest.fn();
+  const atualizar = jest.fn();
   const listar = jest.fn();
   const buscar = jest.fn();
   const dados = {
@@ -18,6 +19,7 @@ describe('Repository Prisma de equipamentos', () => {
 
   beforeEach(async () => {
     criar.mockReset();
+    atualizar.mockReset();
     listar.mockReset();
     buscar.mockReset();
     const modulo = await Test.createTestingModule({
@@ -28,6 +30,7 @@ describe('Repository Prisma de equipamentos', () => {
           useValue: {
             equipamento: {
               create: criar,
+              update: atualizar,
               findMany: listar,
               findUnique: buscar,
             },
@@ -71,19 +74,61 @@ describe('Repository Prisma de equipamentos', () => {
     expect(buscar).toHaveBeenCalledWith({ where: { id: equipamento.id } });
   });
 
-  it('sinaliza uma violacao de unicidade sem decidir a mensagem de negocio', async () => {
-    const erro = new Prisma.PrismaClientKnownRequestError('Duplicidade.', {
-      code: 'P2002',
-      clientVersion: '7.10.0',
-      meta: { target: ['numeroSerie'] },
-    });
-    criar.mockRejectedValue(erro);
+  it.each([
+    { patrimonio: 'PAT-02', patrimonioPersistido: 'PAT-02' },
+    { patrimonio: undefined, patrimonioPersistido: null },
+  ])(
+    'atualiza patrimonio $patrimonio enviando $patrimonioPersistido ao Prisma e retornando esse valor',
+    async ({ patrimonio, patrimonioPersistido }) => {
+      const novosDados = {
+        equipamento: 'Ventilador',
+        marca: 'Outra marca',
+        modelo: 'Outro modelo',
+        numeroSerie: 'SERIE-02',
+        patrimonio,
+      };
+      const equipamentoAtualizado = {
+        ...novosDados,
+        id: '00000000-0000-4000-8000-000000000001',
+        patrimonio: patrimonioPersistido,
+        criadoEm: new Date('2026-09-28T12:00:00Z'),
+        atualizadoEm: new Date('2026-09-30T12:00:00Z'),
+      };
+      atualizar.mockResolvedValue(equipamentoAtualizado);
 
-    const criacao = repositorio.criar(dados);
+      await expect(
+        repositorio.atualizar(equipamentoAtualizado.id, novosDados),
+      ).resolves.toEqual(equipamentoAtualizado);
+      expect(atualizar).toHaveBeenCalledWith({
+        where: { id: equipamentoAtualizado.id },
+        data: { ...novosDados, patrimonio: patrimonioPersistido },
+      });
+    },
+  );
 
-    await expect(criacao).rejects.toBeInstanceOf(ErroUnicidadePersistencia);
-    await expect(criacao).rejects.toHaveProperty('cause', erro);
-  });
+  it.each(['criar', 'atualizar'])(
+    'traduz P2002 ao %s sem decidir a mensagem de negocio',
+    async (operacao) => {
+      const erro = new Prisma.PrismaClientKnownRequestError('Duplicidade.', {
+        code: 'P2002',
+        clientVersion: '7.10.0',
+        meta: { target: ['numeroSerie'] },
+      });
+      const gravar = operacao === 'criar' ? criar : atualizar;
+      gravar.mockRejectedValue(erro);
+
+      const criacao =
+        operacao === 'criar'
+          ? repositorio.criar(dados)
+          : repositorio.atualizar(
+              '00000000-0000-4000-8000-000000000001',
+              dados,
+            );
+
+      await expect(criacao).rejects.toBeInstanceOf(ErroUnicidadePersistencia);
+      await expect(criacao).rejects.toHaveProperty('cause', erro);
+    },
+  );
 
   it('preserva outros erros conhecidos do Prisma', async () => {
     const erro = new Prisma.PrismaClientKnownRequestError(

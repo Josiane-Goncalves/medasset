@@ -3,6 +3,7 @@ import { Prisma } from '../gerado/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   DadosCadastroEquipamento,
+  DadosAtualizacaoEquipamento,
   EquipamentosRepository,
   ErroUnicidadePersistencia,
 } from './equipamentos.repository';
@@ -43,19 +44,38 @@ export class PrismaEquipamentosRepository extends EquipamentosRepository {
         },
       });
     } catch (erro) {
-      if (
-        erro instanceof Prisma.PrismaClientKnownRequestError &&
-        erro.code === 'P2002'
-      ) {
-        throw new ErroUnicidadePersistencia(
-          'Violacao de unicidade na persistencia.',
-          {
-            cause: erro,
-          },
-        );
-      }
-
-      throw erro;
+      this.traduzirErroPersistencia(erro);
     }
+  }
+
+  async atualizar(id: string, dados: DadosAtualizacaoEquipamento) {
+    try {
+      return await this.prisma.equipamento.update({
+        where: { id },
+        data: {
+          equipamento: dados.equipamento,
+          marca: dados.marca,
+          modelo: dados.modelo,
+          numeroSerie: dados.numeroSerie,
+          patrimonio: dados.patrimonio ?? null,
+        },
+      });
+    } catch (erro) {
+      this.traduzirErroPersistencia(erro);
+    }
+  }
+
+  private traduzirErroPersistencia(erro: unknown): never {
+    if (
+      erro instanceof Prisma.PrismaClientKnownRequestError &&
+      erro.code === 'P2002'
+    ) {
+      throw new ErroUnicidadePersistencia(
+        'Violacao de unicidade na persistencia.',
+        { cause: erro },
+      );
+    }
+
+    throw erro;
   }
 }

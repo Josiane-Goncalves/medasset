@@ -8,6 +8,8 @@ export interface DadosCadastroEquipamento {
   patrimonio?: string;
 }
 
+export type DadosAtualizacaoEquipamento = DadosCadastroEquipamento;
+
 export class ErroUnicidadePersistencia extends Error {}
 
 export abstract class EquipamentosRepository {
@@ -18,4 +20,8 @@ export abstract class EquipamentosRepository {
   ): Promise<Equipamento | null>;
   abstract buscarPorPatrimonio(patrimonio: string): Promise<Equipamento | null>;
   abstract criar(dados: DadosCadastroEquipamento): Promise<Equipamento>;
+  abstract atualizar(
+    id: string,
+    dados: DadosAtualizacaoEquipamento,
+  ): Promise<Equipamento>;
 }

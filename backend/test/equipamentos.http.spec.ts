@@ -47,6 +47,7 @@ describe('/equipamentos', () => {
         ) ?? null
       );
     },
+    atualizar: jest.fn(),
     async criar(dados) {
       const equipamento: Equipamento = {
         ...dados,

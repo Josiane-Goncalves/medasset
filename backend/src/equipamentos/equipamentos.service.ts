@@ -3,6 +3,7 @@ import { ErroConflitoEquipamento } from './erro-conflito-equipamento';
 import { ErroEquipamentoNaoEncontrado } from './erro-equipamento-nao-encontrado';
 import {
   DadosCadastroEquipamento,
+  DadosAtualizacaoEquipamento,
   EquipamentosRepository,
   ErroUnicidadePersistencia,
 } from './equipamentos.repository';
@@ -41,7 +42,25 @@ export class EquipamentosService {
     }
   }
 
-  private async verificarDuplicidade(dados: DadosCadastroEquipamento) {
+  async atualizarEquipamento(id: string, dados: DadosAtualizacaoEquipamento) {
+    const equipamento = await this.buscarEquipamentoPorId(id);
+    await this.verificarDuplicidade(dados, equipamento.id);
+
+    try {
+      return await this.equipamentosRepository.atualizar(id, dados);
+    } catch (erro) {
+      if (erro instanceof ErroUnicidadePersistencia) {
+        await this.verificarDuplicidade(dados, equipamento.id);
+      }
+
+      throw erro;
+    }
+  }
+
+  private async verificarDuplicidade(
+    dados: DadosCadastroEquipamento,
+    idIgnorado?: string,
+  ) {
     const equipamentoComNumeroSerie =
       await this.equipamentosRepository.buscarPorNumeroSerie(dados.numeroSerie);
     const equipamentoComPatrimonio =
@@ -51,15 +70,22 @@ export class EquipamentosService {
           )
         : null;
 
-    if (equipamentoComNumeroSerie && equipamentoComPatrimonio) {
+    const numeroSerieDuplicado =
+      equipamentoComNumeroSerie !== null &&
+      equipamentoComNumeroSerie.id !== idIgnorado;
+    const patrimonioDuplicado =
+      equipamentoComPatrimonio !== null &&
+      equipamentoComPatrimonio.id !== idIgnorado;
+
+    if (numeroSerieDuplicado && patrimonioDuplicado) {
       throw new ErroConflitoEquipamento('NUMERO_SERIE_E_PATRIMONIO');
     }
 
-    if (equipamentoComNumeroSerie) {
+    if (numeroSerieDuplicado) {
       throw new ErroConflitoEquipamento('NUMERO_SERIE');
     }
 
-    if (equipamentoComPatrimonio) {
+    if (patrimonioDuplicado) {
       throw new ErroConflitoEquipamento('PATRIMONIO');
     }
   }
