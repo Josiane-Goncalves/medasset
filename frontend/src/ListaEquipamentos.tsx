@@ -17,6 +17,7 @@ export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
     id: string;
     versao: number;
   } | null>(null);
+  const tituloListagem = useRef<HTMLHeadingElement>(null);
   const botaoSelecionado = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -41,7 +42,9 @@ export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
       aria-labelledby="titulo-listagem"
       aria-busy={estado.tipo === 'carregando'}
     >
-      <h2 id="titulo-listagem">Equipamentos cadastrados</h2>
+      <h2 id="titulo-listagem" ref={tituloListagem} tabIndex={-1}>
+        Equipamentos cadastrados
+      </h2>
 
       {estado.tipo === 'carregando' && (
         <p className="estado-listagem" role="status">
@@ -130,6 +133,22 @@ export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
                   }
                 : anterior,
             );
+          }}
+          aoExcluir={(idExcluido) => {
+            definirEstado((anterior) =>
+              anterior.tipo === 'sucesso'
+                ? {
+                    ...anterior,
+                    equipamentos: anterior.equipamentos.filter(
+                      (equipamento) => equipamento.id !== idExcluido,
+                    ),
+                  }
+                : anterior,
+            );
+            definirSelecao((anterior) =>
+              anterior?.id === idExcluido ? null : anterior,
+            );
+            tituloListagem.current?.focus();
           }}
           aoFechar={() => {
             definirSelecao(null);

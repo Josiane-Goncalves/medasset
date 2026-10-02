@@ -1,3 +1,4 @@
+import { excluirEquipamento } from './excluir-equipamento';
 import { FormularioEdicaoEquipamento } from './FormularioEdicaoEquipamento';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -21,10 +22,12 @@ export function DetalhesEquipamento({
   id,
   aoFechar,
   aoAtualizar,
+  aoExcluir,
 }: {
   urlApi: string | undefined;
   id: string;
   aoFechar: () => void;
+  aoExcluir: (id: string) => void;
   aoAtualizar?: (equipamento: EquipamentoDetalhado) => void;
 }) {
   const [estado, definirEstado] = useState<EstadoDetalhes>({
@@ -33,6 +36,31 @@ export function DetalhesEquipamento({
   const [editando, definirEditando] = useState(false);
   const [atualizado, definirAtualizado] = useState(false);
   const titulo = useRef<HTMLHeadingElement>(null);
+  const [confirmandoExclusao, definirConfirmandoExclusao] = useState(false);
+  const [excluindo, definirExcluindo] = useState(false);
+  const [erroExclusao, definirErroExclusao] = useState<string | null>(null);
+  const exclusaoEmAndamento = useRef(false);
+  const perguntaExclusao = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (confirmandoExclusao) perguntaExclusao.current?.focus();
+  }, [confirmandoExclusao]);
+
+  async function confirmarExclusao() {
+    if (exclusaoEmAndamento.current) return;
+    exclusaoEmAndamento.current = true;
+    definirExcluindo(true);
+    definirErroExclusao(null);
+
+    const resultado = await excluirEquipamento(urlApi, id);
+    exclusaoEmAndamento.current = false;
+    definirExcluindo(false);
+    if (resultado.sucesso) {
+      aoExcluir(id);
+    } else {
+      definirErroExclusao(resultado.mensagem);
+    }
+  }
 
   useEffect(() => {
     titulo.current?.focus();
@@ -65,7 +93,12 @@ export function DetalhesEquipamento({
         <h3 id="titulo-detalhes" ref={titulo} tabIndex={-1}>
           Detalhes do equipamento
         </h3>
-        <button type="button" className="botao-secundario" onClick={aoFechar}>
+        <button
+          type="button"
+          className="botao-secundario"
+          onClick={aoFechar}
+          disabled={excluindo}
+        >
           Fechar detalhes
         </button>
       </div>
@@ -100,18 +133,73 @@ export function DetalhesEquipamento({
       )}
       {estado.tipo === 'sucesso' && !editando && (
         <>
-          <div className="acoes-edicao">
-            <button
-              type="button"
-              className="botao-secundario"
-              onClick={() => {
-                definirAtualizado(false);
-                definirEditando(true);
-              }}
+          {!confirmandoExclusao && (
+            <div className="acoes-edicao">
+              <button
+                type="button"
+                className="botao-secundario"
+                onClick={() => {
+                  definirAtualizado(false);
+                  definirEditando(true);
+                }}
+              >
+                Editar
+              </button>{' '}
+              <button
+                type="button"
+                className="botao-secundario"
+                onClick={() => {
+                  definirAtualizado(false);
+                  definirErroExclusao(null);
+                  definirConfirmandoExclusao(true);
+                }}
+              >
+                Excluir
+              </button>
+            </div>
+          )}
+          {confirmandoExclusao && (
+            <div
+              role="group"
+              aria-labelledby="pergunta-exclusao"
+              aria-describedby="aviso-exclusao"
+              aria-busy={excluindo}
             >
-              Editar
-            </button>
-          </div>
+              <p id="pergunta-exclusao" ref={perguntaExclusao} tabIndex={-1}>
+                Tem certeza que deseja excluir este equipamento?
+              </p>
+              <p id="aviso-exclusao">Esta ação não pode ser desfeita.</p>
+              {erroExclusao && (
+                <p className="mensagem mensagem-erro" role="alert">
+                  {erroExclusao}
+                </p>
+              )}
+              {excluindo && (
+                <p role="status">Excluindo equipamento. Aguarde…</p>
+              )}
+              <div className="acoes">
+                <button
+                  type="button"
+                  className="botao-secundario"
+                  disabled={excluindo}
+                  onClick={() => {
+                    definirConfirmandoExclusao(false);
+                    definirErroExclusao(null);
+                    titulo.current?.focus();
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  disabled={excluindo}
+                  onClick={confirmarExclusao}
+                >
+                  {excluindo ? 'Excluindo…' : 'Confirmar exclusão'}
+                </button>
+              </div>
+            </div>
+          )}
           {atualizado && (
             <p className="mensagem mensagem-sucesso" role="status">
               Equipamento atualizado com sucesso.
