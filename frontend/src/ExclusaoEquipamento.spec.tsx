@@ -138,7 +138,7 @@ it('confirma um único DELETE e no sucesso remove a linha, fecha detalhes e foca
   ).not.toBeInTheDocument();
   expect(within(tabela).getByRole('cell', { name: 'SN002' })).toBeVisible();
   expect(
-    screen.getByRole('heading', { name: 'Equipamentos cadastrados' }),
+    screen.getByRole('heading', { name: 'Inventário de equipamentos' }),
   ).toHaveFocus();
   expect(requisicao).toHaveBeenCalledTimes(3);
 });

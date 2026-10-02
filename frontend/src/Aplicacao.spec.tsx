@@ -28,10 +28,10 @@ it('mantém cadastro e listagem na mesma tela e atualiza a lista após cadastrar
   try {
     render(<Aplicacao urlApi="http://localhost:3000" />);
     expect(
-      screen.getByRole('heading', { name: 'Cadastro de equipamento' }),
+      screen.getByRole('heading', { name: 'Novo equipamento' }),
     ).toBeVisible();
     expect(
-      screen.getByRole('heading', { name: 'Equipamentos cadastrados' }),
+      screen.getByRole('heading', { name: 'Inventário de equipamentos' }),
     ).toBeVisible();
     await screen.findByText('Nenhum equipamento cadastrado.');
 
@@ -53,7 +53,7 @@ it('mantém cadastro e listagem na mesma tela e atualiza a lista após cadastrar
       await screen.findByText('Equipamento cadastrado com sucesso.'),
     ).toBeVisible();
     const tabela = await screen.findByRole('table', {
-      name: 'Equipamentos cadastrados',
+      name: 'Inventário de equipamentos',
     });
     expect(within(tabela).getByRole('cell', { name: 'SN001' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Equipamento' })).toHaveValue(

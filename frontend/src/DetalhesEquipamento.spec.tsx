@@ -82,7 +82,9 @@ it('busca pelo ID, mostra carregamento e os dados completos da API, formata data
   expect(within(painel).getByRole('status')).toHaveTextContent(
     'Carregando detalhes do equipamento…',
   );
-  expect(within(painel).getByRole('heading')).toHaveFocus();
+  expect(
+    within(painel).getByRole('heading', { name: 'Detalhes do equipamento' }),
+  ).toHaveFocus();
 
   await act(async () => {
     concluir({ status: 200, json: async () => detalhes } as Response);

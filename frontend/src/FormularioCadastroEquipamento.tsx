@@ -127,8 +127,13 @@ export function FormularioCadastroEquipamento({
   }
 
   return (
-    <section aria-labelledby="titulo-cadastro">
-      <h2 id="titulo-cadastro">Cadastro de equipamento</h2>
+    <section className="cadastro" aria-labelledby="titulo-cadastro">
+      <div className="cabecalho-secao">
+        <h2 id="titulo-cadastro">Novo equipamento</h2>
+        <p>
+          Cadastre as informações de identificação e patrimônio do equipamento.
+        </p>
+      </div>
       <form noValidate onSubmit={enviarFormulario} aria-busy={enviando}>
         <fieldset disabled={enviando}>
           <legend>Identificação do equipamento</legend>

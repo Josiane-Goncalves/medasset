@@ -53,7 +53,7 @@ it('exibe os cinco campos na ordem recebida e usa travessão para patrimônio au
   render(<ListaEquipamentos urlApi={urlApi} />);
 
   const tabela = await screen.findByRole('table', {
-    name: 'Equipamentos cadastrados',
+    name: 'Inventário de equipamentos',
   });
   const linhas = within(tabela).getAllByRole('row').slice(1);
 

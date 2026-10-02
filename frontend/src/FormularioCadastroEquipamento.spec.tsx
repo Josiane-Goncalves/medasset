@@ -50,7 +50,7 @@ it('apresenta o título e os cinco campos com labels e obrigatoriedade', () => {
   render(<FormularioCadastroEquipamento urlApi={urlApi} />);
 
   expect(
-    screen.getByRole('heading', { name: 'Cadastro de equipamento' }),
+    screen.getByRole('heading', { name: 'Novo equipamento' }),
   ).toBeVisible();
   expect(screen.getAllByRole('textbox')).toHaveLength(5);
   for (const nome of Object.keys(rotulos) as (keyof typeof rotulos)[]) {

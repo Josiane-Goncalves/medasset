@@ -147,7 +147,7 @@ export function DetalhesEquipamento({
               </button>{' '}
               <button
                 type="button"
-                className="botao-secundario"
+                className="botao-secundario botao-excluir"
                 onClick={() => {
                   definirAtualizado(false);
                   definirErroExclusao(null);
@@ -160,6 +160,7 @@ export function DetalhesEquipamento({
           )}
           {confirmandoExclusao && (
             <div
+              className="confirmacao-exclusao"
               role="group"
               aria-labelledby="pergunta-exclusao"
               aria-describedby="aviso-exclusao"
@@ -193,6 +194,7 @@ export function DetalhesEquipamento({
                 <button
                   type="button"
                   disabled={excluindo}
+                  className="botao-perigo"
                   onClick={confirmarExclusao}
                 >
                   {excluindo ? 'Excluindo…' : 'Confirmar exclusão'}
@@ -205,46 +207,78 @@ export function DetalhesEquipamento({
               Equipamento atualizado com sucesso.
             </p>
           )}
-          <dl className="dados-detalhes">
-            <div>
-              <dt>Equipamento</dt>
-              <dd>{estado.equipamento.equipamento}</dd>
-            </div>
-            <div>
-              <dt>Marca</dt>
-              <dd>{estado.equipamento.marca}</dd>
-            </div>
-            <div>
-              <dt>Modelo</dt>
-              <dd>{estado.equipamento.modelo}</dd>
-            </div>
-            <div>
-              <dt>Número de série</dt>
-              <dd>{estado.equipamento.numeroSerie}</dd>
-            </div>
-            <div>
-              <dt>Patrimônio</dt>
-              <dd>{estado.equipamento.patrimonio ?? '—'}</dd>
-            </div>
-            <div>
-              <dt>Data de cadastro</dt>
-              <dd>
-                <time dateTime={estado.equipamento.criadoEm}>
-                  {formatadorData.format(new Date(estado.equipamento.criadoEm))}
-                </time>
-              </dd>
-            </div>
-            <div>
-              <dt>Última atualização</dt>
-              <dd>
-                <time dateTime={estado.equipamento.atualizadoEm}>
-                  {formatadorData.format(
-                    new Date(estado.equipamento.atualizadoEm),
-                  )}
-                </time>
-              </dd>
-            </div>
-          </dl>
+          <div className="grupos-detalhes">
+            <section
+              className="grupo-detalhes"
+              aria-labelledby="titulo-identificacao"
+            >
+              <h4 id="titulo-identificacao">Identificação</h4>
+              <dl className="dados-detalhes">
+                <div>
+                  <dt>Equipamento</dt>
+                  <dd className="nome-equipamento">
+                    {estado.equipamento.equipamento}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Marca</dt>
+                  <dd>{estado.equipamento.marca}</dd>
+                </div>
+                <div>
+                  <dt>Modelo</dt>
+                  <dd>{estado.equipamento.modelo}</dd>
+                </div>
+              </dl>
+            </section>
+            <section
+              className="grupo-detalhes"
+              aria-labelledby="titulo-rastreamento"
+            >
+              <h4 id="titulo-rastreamento">Rastreamento</h4>
+              <dl className="dados-detalhes">
+                <div>
+                  <dt>Número de série</dt>
+                  <dd className="valor-rastreamento">
+                    {estado.equipamento.numeroSerie}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Patrimônio</dt>
+                  <dd className="valor-rastreamento">
+                    {estado.equipamento.patrimonio ?? '—'}
+                  </dd>
+                </div>
+              </dl>
+            </section>
+            <section
+              className="grupo-detalhes"
+              aria-labelledby="titulo-registro"
+            >
+              <h4 id="titulo-registro">Registro</h4>
+              <dl className="dados-detalhes">
+                <div>
+                  <dt>Criado em</dt>
+                  <dd>
+                    <time dateTime={estado.equipamento.criadoEm}>
+                      {formatadorData.format(
+                        new Date(estado.equipamento.criadoEm),
+                      )}
+                    </time>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Atualizado em</dt>
+                  <dd>
+                    <time dateTime={estado.equipamento.atualizadoEm}>
+                      {formatadorData.format(
+                        new Date(estado.equipamento.atualizadoEm),
+                      )}
+                    </time>
+                  </dd>
+                </div>
+              </dl>
+            </section>
+          </div>
         </>
       )}
     </section>

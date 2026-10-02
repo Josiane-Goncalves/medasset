@@ -9,17 +9,40 @@ export function Aplicacao({ urlApi }: { urlApi: string | undefined }) {
     <>
       <header className="cabecalho">
         <div className="marca">
-          <span className="simbolo-marca" aria-hidden="true">
-            +
-          </span>
+          <svg
+            className="simbolo-marca"
+            width="40"
+            height="40"
+            viewBox="0 0 40 40"
+            fill="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M15 5H7a2 2 0 0 0-2 2v26a2 2 0 0 0 2 2h8M25 5h8a2 2 0 0 1 2 2v26a2 2 0 0 1-2 2h-8"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path
+              d="M9 23h7l4-10 4 14 3-7h4"
+              stroke="#19A7A0"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="9" cy="23" r="2" fill="#19A7A0" />
+            <circle cx="31" cy="20" r="2" fill="#19A7A0" />
+          </svg>
           <span>MedAsset</span>
         </div>
-        <span className="descricao-marca">Gestão de equipamentos</span>
+        <span className="descricao-marca">
+          Gestão de ativos médico-hospitalares
+        </span>
       </header>
 
       <main>
         <div className="introducao">
-          <p className="identificador">CONTROLE DE EQUIPAMENTOS</p>
+          <p className="identificador">ENGENHARIA CLÍNICA · GESTÃO DE ATIVOS</p>
           <h1>Equipamentos</h1>
           <p>Cadastre e consulte os equipamentos médico-hospitalares.</p>
         </div>

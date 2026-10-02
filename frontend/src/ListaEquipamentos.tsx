@@ -43,7 +43,7 @@ export function ListaEquipamentos({ urlApi }: { urlApi: string | undefined }) {
       aria-busy={estado.tipo === 'carregando'}
     >
       <h2 id="titulo-listagem" ref={tituloListagem} tabIndex={-1}>
-        Equipamentos cadastrados
+        Inventário de equipamentos
       </h2>
 
       {estado.tipo === 'carregando' && (

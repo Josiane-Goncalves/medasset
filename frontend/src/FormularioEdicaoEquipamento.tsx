@@ -171,7 +171,7 @@ export function FormularioEdicaoEquipamento({
           Cancelar
         </button>
         <button type="submit" disabled={salvando}>
-          {salvando ? 'Salvando…' : 'Salvar'}
+          {salvando ? 'Salvando…' : 'Salvar alterações'}
         </button>
       </div>
     </form>

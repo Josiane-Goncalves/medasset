@@ -94,7 +94,9 @@ it('abre a edição com os dados atuais e permite cancelar sem PUT, restaurando 
     name: 'Detalhes do equipamento',
   });
   expect(within(painel).getByText('Monitor')).toBeVisible();
-  expect(within(painel).getByRole('heading')).toHaveFocus();
+  expect(
+    within(painel).getByRole('heading', { name: 'Detalhes do equipamento' }),
+  ).toHaveFocus();
   expect(atualizacao).not.toHaveBeenCalled();
 });
 
@@ -108,7 +110,9 @@ it('envia PUT com os dados alterados e atualiza detalhes e listagem com a respos
       },
     );
   }
-  fireEvent.click(within(formulario).getByRole('button', { name: 'Salvar' }));
+  fireEvent.click(
+    within(formulario).getByRole('button', { name: 'Salvar alterações' }),
+  );
 
   expect(
     await screen.findByText('Equipamento atualizado com sucesso.'),
@@ -134,12 +138,14 @@ it('envia PUT com os dados alterados e atualiza detalhes e listagem com a respos
     'datetime',
     equipamentoAtualizado.atualizadoEm,
   );
-  expect(within(painel).getByRole('heading')).toHaveFocus();
+  expect(
+    within(painel).getByRole('heading', { name: 'Detalhes do equipamento' }),
+  ).toHaveFocus();
   expect(
     screen.queryByRole('form', { name: 'Edição de equipamento' }),
   ).not.toBeInTheDocument();
   expect(
-    screen.getByRole('region', { name: 'Cadastro de equipamento' }),
+    screen.getByRole('region', { name: 'Novo equipamento' }),
   ).toBeVisible();
 });
 
@@ -155,7 +161,9 @@ it('omite patrimônio apagado do payload e mostra sua remoção nos detalhes e n
       target: { value: '' },
     },
   );
-  fireEvent.click(within(formulario).getByRole('button', { name: 'Salvar' }));
+  fireEvent.click(
+    within(formulario).getByRole('button', { name: 'Salvar alterações' }),
+  );
 
   await screen.findByText('Equipamento atualizado com sucesso.');
   expect(JSON.parse(atualizacao.mock.calls[0][1]?.body as string)).toEqual({
@@ -180,7 +188,9 @@ it('impede envio inválido e direciona o foco ao campo para correção', async (
     name: 'Equipamento',
   });
   fireEvent.change(campo, { target: { value: '' } });
-  fireEvent.click(within(formulario).getByRole('button', { name: 'Salvar' }));
+  fireEvent.click(
+    within(formulario).getByRole('button', { name: 'Salvar alterações' }),
+  );
 
   expect(campo).toHaveFocus();
   expect(campo).toHaveAttribute('aria-invalid', 'true');
@@ -196,7 +206,9 @@ it('informa salvamento e bloqueia envios duplicados enquanto aguarda o PUT', asy
     }),
   );
   const formulario = await abrirEdicao();
-  fireEvent.click(within(formulario).getByRole('button', { name: 'Salvar' }));
+  fireEvent.click(
+    within(formulario).getByRole('button', { name: 'Salvar alterações' }),
+  );
 
   expect(formulario).toHaveAttribute('aria-busy', 'true');
   const botao = within(formulario).getByRole('button', { name: 'Salvando…' });
@@ -261,7 +273,9 @@ it.each([
       within(formulario).getByRole('textbox', { name: 'Modelo' }),
       { target: { value: 'Novo modelo' } },
     );
-    fireEvent.click(within(formulario).getByRole('button', { name: 'Salvar' }));
+    fireEvent.click(
+      within(formulario).getByRole('button', { name: 'Salvar alterações' }),
+    );
 
     expect(await within(formulario).findByRole('alert')).toHaveTextContent(
       mensagem,
@@ -270,7 +284,7 @@ it.each([
       within(formulario).getByRole('textbox', { name: 'Modelo' }),
     ).toHaveValue('Novo modelo');
     expect(
-      within(formulario).getByRole('button', { name: 'Salvar' }),
+      within(formulario).getByRole('button', { name: 'Salvar alterações' }),
     ).toBeEnabled();
     expect(screen.queryByText(/Detalhe técnico/)).not.toBeInTheDocument();
     expect(
