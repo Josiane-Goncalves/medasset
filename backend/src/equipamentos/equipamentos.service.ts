@@ -57,6 +57,11 @@ export class EquipamentosService {
     }
   }
 
+  async excluirEquipamento(id: string): Promise<void> {
+    await this.buscarEquipamentoPorId(id);
+    await this.equipamentosRepository.excluir(id);
+  }
+
   private async verificarDuplicidade(
     dados: DadosCadastroEquipamento,
     idIgnorado?: string,

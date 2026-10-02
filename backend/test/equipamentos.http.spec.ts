@@ -24,6 +24,7 @@ describe('/equipamentos', () => {
     patrimonio: 'PAT-01',
   };
   const repositorio: EquipamentosRepository = {
+    excluir: jest.fn(),
     async listar() {
       return equipamentos.toSorted(
         (primeiro, segundo) =>

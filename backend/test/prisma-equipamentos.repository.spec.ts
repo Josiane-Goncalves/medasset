@@ -8,6 +8,7 @@ describe('Repository Prisma de equipamentos', () => {
   let repositorio: PrismaEquipamentosRepository;
   const criar = jest.fn();
   const atualizar = jest.fn();
+  const excluir = jest.fn();
   const listar = jest.fn();
   const buscar = jest.fn();
   const dados = {
@@ -20,6 +21,7 @@ describe('Repository Prisma de equipamentos', () => {
   beforeEach(async () => {
     criar.mockReset();
     atualizar.mockReset();
+    excluir.mockReset();
     listar.mockReset();
     buscar.mockReset();
     const modulo = await Test.createTestingModule({
@@ -31,6 +33,7 @@ describe('Repository Prisma de equipamentos', () => {
             equipamento: {
               create: criar,
               update: atualizar,
+              delete: excluir,
               findMany: listar,
               findUnique: buscar,
             },
@@ -40,6 +43,16 @@ describe('Repository Prisma de equipamentos', () => {
     }).compile();
 
     repositorio = modulo.get(PrismaEquipamentosRepository);
+  });
+
+  it('exclui pelo ID usando delete do Prisma', async () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+    excluir.mockResolvedValue({ ...dados, id });
+
+    await repositorio.excluir(id);
+
+    expect(excluir).toHaveBeenCalledWith({ where: { id } });
+    expect(excluir).toHaveBeenCalledTimes(1);
   });
 
   it('consulta todos os equipamentos por criadoEm decrescente e retorna os registros', async () => {

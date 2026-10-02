@@ -13,6 +13,7 @@ export type DadosAtualizacaoEquipamento = DadosCadastroEquipamento;
 export class ErroUnicidadePersistencia extends Error {}
 
 export abstract class EquipamentosRepository {
+  abstract excluir(id: string): Promise<void>;
   abstract listar(): Promise<Equipamento[]>;
   abstract buscarPorId(id: string): Promise<Equipamento | null>;
   abstract buscarPorNumeroSerie(

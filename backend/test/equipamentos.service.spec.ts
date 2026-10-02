@@ -35,8 +35,32 @@ describe('EquipamentosService', () => {
       buscarPorPatrimonio: jest.fn().mockResolvedValue(null),
       criar: jest.fn().mockResolvedValue(equipamento),
       atualizar: jest.fn(),
+      excluir: jest.fn().mockResolvedValue(undefined),
     };
     servico = new EquipamentosService(repositorio);
+  });
+
+  describe('Exclusao de equipamentos', () => {
+    it('exclui equipamento existente pelo ID', async () => {
+      repositorio.buscarPorId.mockResolvedValue(equipamento);
+
+      await expect(
+        servico.excluirEquipamento(equipamento.id),
+      ).resolves.toBeUndefined();
+
+      expect(repositorio.buscarPorId).toHaveBeenCalledWith(equipamento.id);
+      expect(repositorio.excluir).toHaveBeenCalledWith(equipamento.id);
+      expect(repositorio.excluir).toHaveBeenCalledTimes(1);
+    });
+
+    it('lanca erro de equipamento nao encontrado sem tentar excluir', async () => {
+      repositorio.buscarPorId.mockResolvedValue(null);
+
+      await expect(
+        servico.excluirEquipamento(equipamento.id),
+      ).rejects.toBeInstanceOf(ErroEquipamentoNaoEncontrado);
+      expect(repositorio.excluir).not.toHaveBeenCalled();
+    });
   });
 
   describe('Listagem de equipamentos', () => {

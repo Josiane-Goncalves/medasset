@@ -65,6 +65,10 @@ export class PrismaEquipamentosRepository extends EquipamentosRepository {
     }
   }
 
+  async excluir(id: string): Promise<void> {
+    await this.prisma.equipamento.delete({ where: { id } });
+  }
+
   private traduzirErroPersistencia(erro: unknown): never {
     if (
       erro instanceof Prisma.PrismaClientKnownRequestError &&
