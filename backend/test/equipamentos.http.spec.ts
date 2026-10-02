@@ -470,4 +470,50 @@ describe('/equipamentos', () => {
       expect(equipamentos[0].patrimonio).toBeNull();
     });
   });
+
+  describe('DELETE /equipamentos/:id', () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+
+    it('retorna 204 sem corpo ao excluir equipamento existente', async () => {
+      const excluir = jest
+        .spyOn(aplicacao.get(EquipamentosService), 'excluirEquipamento')
+        .mockResolvedValueOnce(undefined);
+
+      const resposta = await request(aplicacao.getHttpServer())
+        .delete('/equipamentos/' + id)
+        .expect(204);
+
+      expect(resposta.text).toBe('');
+      expect(excluir).toHaveBeenCalledWith(id);
+      expect(excluir).toHaveBeenCalledTimes(1);
+    });
+
+    it('retorna 400 para UUID invalido antes de chamar o service', async () => {
+      const excluir = jest.spyOn(
+        aplicacao.get(EquipamentosService),
+        'excluirEquipamento',
+      );
+
+      await request(aplicacao.getHttpServer())
+        .delete('/equipamentos/id-invalido')
+        .expect(400);
+
+      expect(excluir).not.toHaveBeenCalled();
+    });
+
+    it('traduz equipamento inexistente para 404', async () => {
+      jest
+        .spyOn(aplicacao.get(EquipamentosService), 'excluirEquipamento')
+        .mockRejectedValueOnce(new ErroEquipamentoNaoEncontrado());
+
+      await request(aplicacao.getHttpServer())
+        .delete('/equipamentos/' + id)
+        .expect(404)
+        .expect({
+          statusCode: 404,
+          message: 'Equipamento não encontrado.',
+          error: 'Not Found',
+        });
+    });
+  });
 });

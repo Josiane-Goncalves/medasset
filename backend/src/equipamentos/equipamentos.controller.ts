@@ -2,7 +2,10 @@ import {
   Body,
   ConflictException,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   ParseUUIDPipe,
@@ -64,6 +67,22 @@ export class EquipamentosController {
 
       if (erro instanceof ErroConflitoEquipamento) {
         throw new ConflictException(erro.message);
+      }
+
+      throw erro;
+    }
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async excluirEquipamento(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    try {
+      await this.equipamentosService.excluirEquipamento(id);
+    } catch (erro) {
+      if (erro instanceof ErroEquipamentoNaoEncontrado) {
+        throw new NotFoundException(erro.message);
       }
 
       throw erro;
