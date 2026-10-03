@@ -1,197 +1,101 @@
 # MedAsset
 
-Sistema full stack para controle de equipamentos médico-hospitalares.
+**Sistema full stack para gestão de ativos médico-hospitalares, inspirado em necessidades reais de engenharia clínica.**
 
-O MedAsset foi criado para centralizar informações essenciais sobre equipamentos utilizados em ambientes de saúde, facilitando identificação, rastreabilidade, consulta e acompanhamento de manutenção.
+O MedAsset centraliza o cadastro e a consulta de equipamentos utilizados em ambientes de saúde. A identificação por número de série e patrimônio apoia a rastreabilidade dos ativos, enquanto a validação das entradas e o controle de duplicidade preservam a integridade dos dados.
 
-A proposta do projeto é simples: construir um sistema funcional, direto e sustentável, sem complexidade arquitetural desnecessária.
+![Tela principal do MedAsset](docs/images/medasset-home.png)
 
----
+## Funcionalidades implementadas
 
-## Sobre o projeto
+- Cadastro, listagem e consulta de detalhes de equipamentos.
+- Edição dos dados de identificação e patrimônio.
+- Exclusão com confirmação na interface.
+- Número de série obrigatório e único.
+- Patrimônio opcional e único quando informado.
+- Validação no backend e tratamento controlado de erros.
+- Persistência em PostgreSQL.
+- Interface responsiva.
+- Testes automatizados no frontend e no backend.
 
-Em ambientes hospitalares e clínicos, equipamentos médico-hospitalares precisam ser identificados, localizados e acompanhados com clareza.
-
-Informações como:
-
-- equipamento;
-- marca;
-- modelo;
-- número de série;
-- patrimônio;
-- status operacional;
-- manutenção preventiva;
-
-fazem parte da rotina de engenharia clínica e de setores responsáveis pelo controle desses ativos.
-
-O MedAsset nasce para organizar esse fluxo em uma aplicação web simples, com regras claras e foco em confiabilidade dos dados.
-
----
-
-## Objetivos
-
-O projeto tem como objetivos principais:
-
-- centralizar o cadastro de equipamentos;
-- evitar registros duplicados;
-- facilitar busca e identificação;
-- acompanhar o estado dos equipamentos;
-- apoiar o controle de manutenção preventiva;
-- manter regras de negócio simples e explícitas;
-- garantir integridade dos dados;
-- aplicar boas práticas de desenvolvimento full stack.
-
----
-
-## Escopo
-
-O desenvolvimento é feito de forma incremental, por pequenas funcionalidades independentes.
-
-Entre as funcionalidades planejadas estão:
-
-- cadastro de equipamentos;
-- edição e exclusão;
-- consulta e detalhamento;
-- busca e filtros;
-- controle de número de série e patrimônio únicos;
-- status operacional;
-- acompanhamento de manutenção preventiva;
-- autenticação;
-- perfis de acesso `ADMIN` e `USER`.
-
-O objetivo não é transformar o MedAsset em um ERP hospitalar ou em uma plataforma completa de engenharia clínica.
-
-O foco é resolver bem um conjunto específico de problemas.
-
----
-
-## Regras de negócio
-
-Algumas regras fazem parte da base do sistema:
-
-- número de série é obrigatório e único;
-- patrimônio, quando informado, também deve ser único;
-- equipamentos duplicados devem ser identificados de forma clara;
-- dados enviados para a API são validados no backend;
-- regras de negócio não dependem apenas das validações do frontend;
-- integridade dos dados também é protegida no banco.
-
-Novas regras são adicionadas apenas quando necessárias ao domínio do projeto.
-
----
-
-## Arquitetura
-
-O backend segue uma separação simples de responsabilidades:
+## Fluxo da aplicação
 
 ```text
-Controller
-    ↓
+React
+  ↓ HTTP
+NestJS Controller
+  ↓
 Service
-    ↓
+  ↓
 Repository
-    ↓
+  ↓
 Prisma
-    ↓
+  ↓
 PostgreSQL
 ```
 
-A intenção é manter cada camada com uma responsabilidade clara:
-
-- **Controller:** comunicação HTTP;
-- **Service:** regras de negócio;
-- **Repository:** persistência;
-- **Prisma/PostgreSQL:** acesso e armazenamento dos dados.
-
-O projeto evita abstrações que não tragam benefício real para o escopo atual.
-
----
+O **React** apresenta os formulários, o inventário e os detalhes, consumindo a API por funções específicas de acesso HTTP. O **controller** recebe entradas validadas, chama o service e traduz erros da aplicação em respostas HTTP. O **service** concentra as regras de negócio e coordena o **repository**, responsável pela persistência por meio do **Prisma** no **PostgreSQL**.
 
 ## Tecnologias
 
-### Frontend
+| Área                 | Tecnologias                                         |
+| -------------------- | --------------------------------------------------- |
+| Frontend             | React, TypeScript e Vite                            |
+| Backend              | Node.js, NestJS e TypeScript                        |
+| Persistência         | PostgreSQL e Prisma ORM                             |
+| Qualidade            | Jest, Testing Library, Supertest, ESLint e Prettier |
+| Infraestrutura local | Docker Compose                                      |
 
-- React
-- TypeScript
-- Vite
+## Detalhes da interface
 
-### Backend
+O painel de detalhes organiza os dados em identificação, rastreamento e registro. A partir dele, é possível editar o equipamento ou iniciar a exclusão com confirmação.
 
-- Node.js
-- NestJS
-- TypeScript
+![Detalhes do equipamento](docs/images/medasset-detalhes.png)
 
-### Banco de dados
+![Confirmação de exclusão de equipamento](docs/images/medasset-exclusao.png)
 
-- PostgreSQL
-- Prisma ORM
+## Decisões técnicas
 
-### Qualidade
+- **Regras no service:** existência e duplicidade são verificadas na camada de negócio.
+- **Controller focado em HTTP:** rotas delegam ao service e traduzem erros conhecidos para os status correspondentes.
+- **Repository separando negócio de Prisma:** o service depende do contrato de persistência; a implementação concentra as operações do ORM.
+- **Validação também no backend:** DTOs e `ValidationPipe` validam as entradas e rejeitam propriedades não previstas, independentemente da interface.
+- **Unicidade no banco:** constraints protegem número de série e patrimônio. O tratamento de duplicidade identifica os campos em conflito e retorna `409 Conflict` quando o conflito é reconhecido.
+- **Exclusão física:** nesta versão, a operação remove o registro do banco após confirmação na interface.
+- **Arquitetura proporcional ao escopo:** camadas com responsabilidades claras, componentes específicos e callbacks locais mantêm os fluxos compreensíveis, sem estado global ou abstrações genéricas desnecessárias.
 
-- Jest
-- ESLint
-- Prettier
+## Testes e qualidade
 
-### Infraestrutura local
+Os testes automatizados cobrem regras de negócio, operações do repository de persistência, contrato HTTP e comportamento do frontend. Jest executa as suítes; Supertest verifica as respostas da API; Testing Library exercita as interações com a interface.
 
-- Docker Compose
+Os testes do repository usam Prisma simulado, e os testes HTTP substituem a persistência. Essa cobertura não equivale a testes de integração com uma instância real do PostgreSQL. No frontend, as respostas da API também são simuladas.
 
----
+ESLint, Prettier e os builds com TypeScript complementam as verificações de qualidade.
 
-## Qualidade e segurança
+## Regras principais
 
-O MedAsset é desenvolvido com atenção a alguns princípios:
-
-- validação de entrada no backend;
-- tratamento controlado de erros;
-- proteção de variáveis de ambiente;
-- CORS configurado por ambiente;
-- constraints de banco para integridade dos dados;
-- testes de regras e comportamentos relevantes;
-- funções e responsabilidades pequenas;
-- redução de duplicação;
-- código legível e de fácil manutenção.
-
----
-
-## Processo de desenvolvimento
-
-O projeto é desenvolvido em pequenas fatias.
-
-Cada funcionalidade passa por:
-
-```text
-Definição de comportamento
-        ↓
-Implementação
-        ↓
-Testes
-        ↓
-Revisão
-        ↓
-Commit
-```
-
-Essa abordagem permite evoluir o sistema sem perder clareza sobre o comportamento de cada parte.
-
----
+- Número de série é obrigatório e único.
+- Patrimônio é opcional e deve ser único quando informado.
+- Equipamento, marca, modelo e número de série devem conter entre 2 e 20 caracteres; o mesmo limite vale para patrimônio quando informado.
+- Na edição, omitir o patrimônio remove o valor anterior.
+- Propriedades não previstas no contrato de entrada são rejeitadas com `400 Bad Request`.
+- Conflitos de número de série e patrimônio identificados pela aplicação retornam `409 Conflict`, com mensagem de negócio.
+- Equipamento inexistente em consulta, edição ou exclusão retorna `404 Not Found`.
 
 ## Contexto
 
-O MedAsset foi inspirado em necessidades reais de ambientes hospitalares e de engenharia clínica.
+O projeto conecta experiência real em saúde e engenharia clínica com desenvolvimento de software. O conhecimento das rotinas de identificação e controle de equipamentos orienta a construção de uma aplicação voltada à organização dos ativos e à confiabilidade dos registros.
 
-O projeto combina conhecimento de domínio em saúde com desenvolvimento de software, buscando transformar rotinas operacionais em soluções digitais simples e confiáveis.
+## Evoluções planejadas
 
----
+Os itens abaixo ainda não estão implementados:
 
-## Status
-
-Em desenvolvimento.
-
-A evolução do projeto pode ser acompanhada pelo histórico de commits e pelas funcionalidades disponíveis no repositório.
+- Busca e filtros.
+- Status operacional.
+- Histórico e acompanhamento de manutenção.
+- Autenticação.
+- Perfis de acesso.
 
 ## Autoria
 
-Desenvolvido por **Josiane Gonçalves**.
-
-Profissional em transição para desenvolvimento de software, com experiência na área da saúde e em engenharia clínica.
+Josiane Gonçalves
